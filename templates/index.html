@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>RAG Knowledge Assistant</title>
+
+    <link
+        rel="stylesheet"
+        href="/static/style.css"
+    >
+
+</head>
+
+
+<body>
+
+
+<div class="app">
+
+
+    <!-- ========================================
+         Sidebar
+    ========================================= -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                ✦
+            </div>
+
+            <div>
+
+                <h2>RAG Assistant</h2>
+
+                <span>
+                    Knowledge Workspace
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="sidebar-section">
+
+            <p class="section-label">
+                KNOWLEDGE BASE
+            </p>
+
+
+            <div class="document-count">
+
+                <div class="count-icon">
+                    📚
+                </div>
+
+                <div>
+
+                    <strong id="documentCount">
+                        --
+                    </strong>
+
+                    <span>
+                        Documents
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="indexed-count">
+
+                <div class="count-icon">
+                    ◈
+                </div>
+
+                <div>
+
+                    <strong id="chunkCount">
+                        --
+                    </strong>
+
+                    <span>
+                        Indexed Chunks
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="sidebar-bottom">
+
+            <div class="connection">
+
+                <span class="connection-dot"></span>
+
+                <div>
+
+                    <strong>
+                        System Online
+                    </strong>
+
+                    <small>
+                        RAG engine ready
+                    </small>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+
+    <!-- ========================================
+         Main
+    ========================================= -->
+
+    <main class="main">
+
+
+        <!-- Header -->
+
+        <header class="topbar">
+
+            <div>
+
+                <span class="eyebrow">
+                    AI DOCUMENT INTELLIGENCE
+                </span>
+
+                <h1>
+                    Ask your documents.
+                </h1>
+
+                <p>
+                    Search your knowledge base and get
+                    answers grounded in your documents.
+                </p>
+
+            </div>
+
+
+            <div class="api-status">
+
+                <span
+                    id="statusDot"
+                    class="status-dot"
+                ></span>
+
+                <span id="statusText">
+                    Checking...
+                </span>
+
+            </div>
+
+        </header>
+
+
+
+        <!-- ========================================
+             Question Card
+        ========================================= -->
+
+        <section class="query-card">
+
+
+            <div class="card-heading">
+
+                <div>
+
+                    <span class="mini-label">
+                        ASK A QUESTION
+                    </span>
+
+                    <h2>
+                        What would you like to know?
+                    </h2>
+
+                </div>
+
+                <div class="sparkle">
+                    ✦
+                </div>
+
+            </div>
+
+
+
+            <div class="question-wrapper">
+
+                <textarea
+                    id="question"
+                    placeholder="Ask something about your documents..."
+                    rows="5"
+                ></textarea>
+
+
+                <div class="question-hint">
+                    Press Enter to ask · Shift + Enter for a new line
+                </div>
+
+            </div>
+
+
+
+            <!-- Controls -->
+
+            <div class="controls">
+
+
+                <div class="control-group">
+
+                    <label>
+                        <span>DOCUMENT SOURCE</span>
+                    </label>
+
+                    <div class="select-wrapper">
+
+                        <span class="select-icon">
+                            📄
+                        </span>
+
+                        <select id="source">
+
+                            <option value="">
+                                All Documents
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="control-group top-k-control">
+
+                    <label>
+                        <span>RETRIEVAL DEPTH</span>
+
+                        <span
+                            id="topKValue"
+                            class="value-badge"
+                        >
+                            5
+                        </span>
+
+                    </label>
+
+                    <input
+                        type="range"
+                        id="top_k"
+                        min="1"
+                        max="10"
+                        value="5"
+                    >
+
+                </div>
+
+
+
+                <button
+                    id="askButton"
+                    onclick="askQuestion()"
+                >
+
+                    <span>
+                        Ask AI
+                    </span>
+
+                    <span class="arrow">
+                        →
+                    </span>
+
+                </button>
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- ========================================
+             Loading
+        ========================================= -->
+
+        <div
+            id="loading"
+            class="loading hidden"
+        >
+
+            <div class="loader"></div>
+
+            <div>
+
+                <strong>
+                    Searching your knowledge base
+                </strong>
+
+                <span>
+                    Retrieving relevant information and generating an answer...
+                </span>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- ========================================
+             Answer
+        ========================================= -->
+
+        <section
+            id="answerSection"
+            class="result-card hidden"
+        >
+
+            <div class="result-header">
+
+                <div class="result-title">
+
+                    <div class="answer-icon">
+                        ✦
+                    </div>
+
+                    <div>
+
+                        <span class="mini-label">
+                            AI RESPONSE
+                        </span>
+
+                        <h2>
+                            Answer
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <span class="grounded-badge">
+                    ✓ Grounded in documents
+                </span>
+
+            </div>
+
+
+            <div
+                id="answer"
+                class="answer"
+            ></div>
+
+        </section>
+
+
+
+        <!-- ========================================
+             Sources
+        ========================================= -->
+
+        <section
+            id="sourcesSection"
+            class="sources-section hidden"
+        >
+
+            <div class="sources-heading">
+
+                <div>
+
+                    <span class="mini-label">
+                        RETRIEVAL RESULTS
+                    </span>
+
+                    <h2>
+                        Supporting Sources
+                    </h2>
+
+                </div>
+
+                <span
+                    id="sourceCount"
+                    class="source-count"
+                >
+                    0 sources
+                </span>
+
+            </div>
+
+
+            <div id="sources"></div>
+
+        </section>
+
+
+    </main>
+
+</div>
+
+
+
+<script>
+
+
+// ========================================
+// Load Documents
+// ========================================
+
+async function loadDocuments() {
+
+    const select =
+        document.getElementById("source");
+
+    try {
+
+        const response =
+            await fetch("/documents");
+
+        const data =
+            await response.json();
+
+
+        document.getElementById(
+            "documentCount"
+        ).textContent = data.count;
+
+
+        data.documents.forEach(
+            function(document) {
+
+                const option =
+                    document.createElement("option");
+
+                option.value =
+                    document.name;
+
+                option.textContent =
+                    document.name;
+
+                select.appendChild(
+                    option
+                );
+
+            }
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Could not load documents:",
+            error
+        );
+
+    }
+}
+
+
+
+// ========================================
+// Health Check
+// ========================================
+
+async function checkHealth() {
+
+    const statusText =
+        document.getElementById(
+            "statusText"
+        );
+
+    const statusDot =
+        document.getElementById(
+            "statusDot"
+        );
+
+
+    try {
+
+        const response =
+            await fetch("/health");
+
+        const data =
+            await response.json();
+
+
+        document.getElementById(
+            "chunkCount"
+        ).textContent =
+            data.indexed_chunks;
+
+
+        if (
+            data.status === "ok"
+        ) {
+
+            statusText.textContent =
+                "System Online";
+
+            statusDot.classList.add(
+                "online"
+            );
+
+        } else {
+
+            statusText.textContent =
+                "Starting";
+
+        }
+
+
+    } catch (error) {
+
+        statusText.textContent =
+            "Offline";
+
+        statusDot.classList.remove(
+            "online"
+        );
+
+    }
+
+}
+
+
+
+// ========================================
+// Top K Slider
+// ========================================
+
+document
+    .getElementById("top_k")
+    .addEventListener(
+        "input",
+        function() {
+
+            document.getElementById(
+                "topKValue"
+            ).textContent =
+                this.value;
+
+        }
+    );
+
+
+
+// ========================================
+// Ask Question
+// ========================================
+
+async function askQuestion() {
+
+    const question =
+        document
+            .getElementById("question")
+            .value
+            .trim();
+
+
+    const topK =
+        parseInt(
+            document.getElementById(
+                "top_k"
+            ).value
+        );
+
+
+    const source =
+        document.getElementById(
+            "source"
+        ).value;
+
+
+    if (!question) {
+
+        showError(
+            "Please enter a question first."
+        );
+
+        return;
+
+    }
+
+
+    const button =
+        document.getElementById(
+            "askButton"
+        );
+
+    const loading =
+        document.getElementById(
+            "loading"
+        );
+
+
+    const answerSection =
+        document.getElementById(
+            "answerSection"
+        );
+
+
+    const sourcesSection =
+        document.getElementById(
+            "sourcesSection"
+        );
+
+
+    button.disabled = true;
+
+    button.innerHTML =
+        `<span>Thinking...</span><span class="spinner"></span>`;
+
+
+    loading.classList.remove(
+        "hidden"
+    );
+
+
+    answerSection.classList.add(
+        "hidden"
+    );
+
+    sourcesSection.classList.add(
+        "hidden"
+    );
+
+
+    try {
+
+        const response =
+            await fetch(
+                "/rag/query",
+                {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        question:
+                            question,
+
+                        top_k:
+                            topK,
+
+                        source:
+                            source
+                                ? source
+                                : null
+
+                    })
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.detail ||
+                "Something went wrong."
+            );
+
+        }
+
+
+        // Answer
+
+        document.getElementById(
+            "answer"
+        ).textContent =
+            data.answer;
+
+
+        answerSection.classList.remove(
+            "hidden"
+        );
+
+
+        // Sources
+
+        renderSources(
+            data.sources || []
+        );
+
+
+        // Scroll to answer
+
+        setTimeout(
+            function() {
+
+                answerSection.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start"
+                });
+
+            },
+            100
+        );
+
+
+    } catch (error) {
+
+        document.getElementById(
+            "answer"
+        ).textContent =
+            "Error: " +
+            error.message;
+
+
+        answerSection.classList.remove(
+            "hidden"
+        );
+
+
+    } finally {
+
+        button.disabled = false;
+
+        button.innerHTML =
+            `<span>Ask AI</span><span class="arrow">→</span>`;
+
+        loading.classList.add(
+            "hidden"
+        );
+
+    }
+
+}
+
+
+
+// ========================================
+// Render Sources
+// ========================================
+
+function renderSources(
+    sources
+) {
+
+    const container =
+        document.getElementById(
+            "sources"
+        );
+
+
+    const section =
+        document.getElementById(
+            "sourcesSection"
+        );
+
+
+    const count =
+        document.getElementById(
+            "sourceCount"
+        );
+
+
+    container.innerHTML = "";
+
+
+    if (
+        !sources ||
+        sources.length === 0
+    ) {
+
+        return;
+
+    }
+
+
+    count.textContent =
+        sources.length +
+        (
+            sources.length === 1
+                ? " source"
+                : " sources"
+        );
+
+
+    sources.forEach(
+        function(source, index) {
+
+            const card =
+                document.createElement(
+                    "div"
+                );
+
+
+            card.className =
+                "source-card";
+
+
+            const page =
+                source.page &&
+                source.page !== 0
+                    ? "Page " +
+                      source.page
+                    : "Document";
+
+
+            card.innerHTML = `
+
+                <div class="source-top">
+
+                    <div class="source-number">
+                        ${String(index + 1).padStart(2, "0")}
+                    </div>
+
+                    <div class="source-main">
+
+                        <strong>
+                            ${escapeHtml(
+                                source.source
+                            )}
+                        </strong>
+
+                        <span>
+                            ${page}
+                            ·
+                            Chunk ${source.chunk}
+                        </span>
+
+                    </div>
+
+                    <div class="distance">
+                        ${Number(
+                            source.distance
+                        ).toFixed(3)}
+                    </div>
+
+                </div>
+
+                <div class="source-content">
+                    ${escapeHtml(
+                        source.text
+                    )}
+                </div>
+
+            `;
+
+
+            container.appendChild(
+                card
+            );
+
+        }
+    );
+
+
+    section.classList.remove(
+        "hidden"
+    );
+
+}
+
+
+
+// ========================================
+// Error
+// ========================================
+
+function showError(message) {
+
+    const answerSection =
+        document.getElementById(
+            "answerSection"
+        );
+
+
+    document.getElementById(
+        "answer"
+    ).textContent =
+        message;
+
+
+    answerSection.classList.remove(
+        "hidden"
+    );
+
+}
+
+
+
+// ========================================
+// Escape HTML
+// ========================================
+
+function escapeHtml(text) {
+
+    const div =
+        document.createElement(
+            "div"
+        );
+
+    div.textContent =
+        text;
+
+    return div.innerHTML;
+
+}
+
+
+
+// ========================================
+// Enter Key
+// ========================================
+
+document
+    .getElementById("question")
+    .addEventListener(
+        "keydown",
+        function(event) {
+
+            if (
+                event.key === "Enter" &&
+                !event.shiftKey
+            ) {
+
+                event.preventDefault();
+
+                askQuestion();
+
+            }
+
+        }
+    );
+
+
+
+// ========================================
+// Initialize
+// ========================================
+
+loadDocuments();
+
+checkHealth();
+
+
+</script>
+
+
+</body>
+
+</html>
