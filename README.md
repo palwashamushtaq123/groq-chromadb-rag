@@ -6,13 +6,23 @@ This project provides end-to-end document question-answering with **100% free lo
 
 ---
 
+## 🖼️ Application Preview
+
+### Web UI Dashboard
+![Web Dashboard](assets/web_ui.png)
+
+### Terminal / CLI Interface
+![CLI Demo](assets/cli_demo.png)
+
+---
+
 ## 🌟 Key Features
 
 * ⚡ **Ultra-Fast Answer Generation**: Powered by the Groq API using the `openai/gpt-oss-20b` model.
 * 🔒 **Free Local Embeddings**: Runs `sentence-transformers/all-MiniLM-L6-v2` locally via Hugging Face—no external API keys required for vector embeddings.
 * 📂 **Multi-Format Support**: Native ingestion for `.pdf`, `.txt`, and `.md` document types.
 * 🧩 **Smart Chunking & Ingestion**: Custom sliding-window text chunking with deterministic SHA-256 chunk hashing to avoid duplication.
-* 🖥️️ **Full-Stack Interfaces**:
+* 🖥️ **Full-Stack Interfaces**:
   * **Web Dashboard**: Responsive web interface (`templates/index.html`) served directly by FastAPI with custom CSS (`static/style.css`).
   * **REST API**: Production-ready FastAPI endpoints with automated OpenAPI (`/docs`) interactive documentation.
   * **Interactive CLI**: Terminal-based client (`cli.py`) for instant testing and debugging.
@@ -77,6 +87,7 @@ groq_chromadb_rag/
 │   ├── ingest_service.py   # Ingestion runner and vector store pipeline
 │   ├── rag_service.py       # Core RAG retrieval and prompt context builder
 │   └── vector_store.py      # Persistent ChromaDB client wrapper
+├── assets/                  # Folder for working app screenshots (web_ui.png, cli_demo.png)
 ├── data/                    # Storage directory for source documents (.pdf, .txt, .md)
 ├── static/                  # Web styling assets (style.css)
 ├── templates/               # Web application UI (index.html)
@@ -135,12 +146,14 @@ cd groq_chromadb_rag
 ### 2. Create Virtual Environment
 
 **Windows (PowerShell):**
+
 ```powershell
 python -m venv venv
 .\venv\Scripts\Activate.ps1
 ```
 
 **macOS / Linux:**
+
 ```bash
 python3 -m venv venv
 source venv/bin/activate
